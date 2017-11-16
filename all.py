@@ -213,21 +213,22 @@ def sequence(handle,position,pwm,loopAmount):
 # go_to_position(0.75)
 
 
-# Gravity Polar
-pwm = (1500,1500,1040,1040)
-AoA_rad = np.arange(-0.3, +1.3, 0.1)
-for i in AoA_rad:
-  sequence(handle,i,pwm,loopAmount)
+# # Gravity Polar
+# pwm = (1500,1500,1040,1040)
+# AoA_rad = np.arange(-0.3, +1.3, 0.1)
+# for i in AoA_rad:
+#   sequence(handle,i,pwm,loopAmount)
 
 
 
 # Loop through all combinations of inputs
 # Input values to be tested in all combinations
-AoA_rad = np.arange(-0.33, +1.0, 0.1742)
+AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+65), 0.1742)
+#AoA_rad = np.arange(-0.33, +1.0, 0.1742)
 servo_valsr = [1500, 1700, 1833, 1300, 1100]
 servo_valsl = [1500, 1300, 1100, 1700, 1900]
 motor_vals  = [1200, 1300, 1400, 1500]
-for a in AoA_rad:
+for a in AoA_deg:
   for i in range(0, len(servo_valsr)):
       for j in range(0, len(motor_vals)):
           pwm = (servo_valsr[i], servo_valsl[i], motor_vals[j], motor_vals[j],)

@@ -13,6 +13,7 @@ import time
 import sys
 import utility_functions as uf
 import numpy as np
+import datetime
 
 
 servo_neutral = 1500
@@ -174,7 +175,7 @@ pwm = (1400,1400,1500,1500)
 print("Servo Values changed")
 
 # Start a file
-filename = "log_file.txt"
+filename = datenow.strftime("%d_%m_%y__%H_%M")
 
 log_file = open(filename, "w")
 

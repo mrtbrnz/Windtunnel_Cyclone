@@ -76,6 +76,15 @@ if not group:
 
 # Init position
 position_rad = 0.451
+# global actual_position
+
+actual_position = 5.0
+
+def update_position(value):
+  global actual_position
+  actual_position = value
+
+
 
 # Sets the command lifetime to 100 milliseconds
 group.set_command_lifetime_ms(100)
@@ -86,7 +95,9 @@ group_command = GroupCommand(group.size)
 
 # HEBI feedback Handler
 def feedback_handler(group_fbk):
-  print("Position :", group_fbk.position)
+  # Uncomment to print out the actual position
+  #print("Position :", group_fbk.position)
+  update_position(group_fbk.position)
   group_command.set_position([position_rad])
   # group_command.set_effort(spring_constant * group_fbk.position)
   group.send_command(group_command)
@@ -178,7 +189,7 @@ group.add_feedback_handler(feedback_handler)
 # Control the robot at 100Hz for 30 seconds
 group.set_feedback_frequency(100)
 
-pwm = (1400,1400,1200,1200)
+pwm = (1400,1400,1500,1500)
 
 
 
@@ -215,8 +226,10 @@ while i < loopAmount:
         ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm_val(pwm[2]))
         ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm_val(pwm[3]))
 
+        # actual_position = group_fbk.position
 
-        print("%f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f" % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6], pwm[0], pwm[1], pwm[2], pwm[3]) )
+
+        print("%f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6], pwm[0], pwm[1], pwm[2], pwm[3], actual_position) )
         # IvySendMsg("LABJACK %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6]) )
         # Raw values
         #IvySendMsg("LABJACK %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), results[0], results[1], results[2], results[3], results[4], results[5], results[6]) )

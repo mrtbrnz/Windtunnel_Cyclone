@@ -60,5 +60,7 @@ def signal_to_force(signal):
 	force = C40.dot(AB.T)
 	return force
 
+def get_hebi_from_aircraft_angle(angle):
+    return ((angle - 30)*0.0186+0.503)
 
 

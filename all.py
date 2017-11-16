@@ -12,13 +12,8 @@ from labjack import ljm
 import time
 import sys
 import utility_functions as uf
-# import os
-# import platform
-# from ivy.std_api import *
 import numpy as np
 
-def pwm_val(value):
-    return int(value/20000.0*1600000.0)
 
 servo_neutral = 1500
 motor_neutral = 1040
@@ -37,21 +32,6 @@ C40 = np.array([
 		[-0.00249,  -0.03763,   0.14501,   0.02394,  -0.15264,   0.01486 ],
 		[-0.17046,  -0.00215,   0.08486,  -0.03049,   0.08772,   0.03596 ],
 		[ 0.00226,  -0.08472,  -0.00019,  -0.08519,   0.00105,  -0.08698 ] ])
-
-# if os.getenv('IVY_BUS') is not None:
-#     IVY_BUS = os.getenv('IVY_BUS')
-# elif platform.system() == 'Darwin':
-#     IVY_BUS = "127.0.0.1:2010"
-# else:
-#     IVY_BUS = ""
-
-# IVY_BUS = "127.0.0.1:2010"
-
-# IvyInit("LABJACK", "LABJACK READY")
-# IvyStart(IVY_BUS)
-# time.sleep(1)
-
-
 
 
 # Open first found LabJack
@@ -83,7 +63,6 @@ actual_position = 5.0
 def update_position(value):
   global actual_position
   actual_position = value
-
 
 
 # Sets the command lifetime to 100 milliseconds
@@ -158,25 +137,25 @@ ljm.eWriteName(handle, "DIO_EF_CLOCK0_ENABLE", 1)   # Enable the clock source
 ljm.eWriteName(handle, "DIO0_EF_ENABLE", 0)  # Disable the EF system for initial configuration
 ljm.eWriteName(handle, "DIO0_EF_INDEX", 0)   # Configure EF system for PWM
 ljm.eWriteName(handle, "DIO0_EF_OPTIONS", 0) # Configure what clock source to use: Clock0
-ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm_val(servo_neutral)) # Configure duty cycle to so that PWM is 1500ms
+ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", uf.pwm_val(servo_neutral)) # Configure duty cycle to so that PWM is 1500ms
 ljm.eWriteName(handle, "DIO0_EF_ENABLE", 1) # Enable the EF system, PWM wave is now being outputted
 
 ljm.eWriteName(handle, "DIO2_EF_ENABLE", 0)  # Disable the EF system for initial configuration
 ljm.eWriteName(handle, "DIO2_EF_INDEX", 0)   # Configure EF system for PWM
 ljm.eWriteName(handle, "DIO2_EF_OPTIONS", 0) # Configure what clock source to use: Clock0
-ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm_val(servo_neutral)) # Configure duty cycle to be: 50%
+ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", uf.pwm_val(servo_neutral)) # Configure duty cycle to be: 50%
 ljm.eWriteName(handle, "DIO2_EF_ENABLE", 1) # Enable the EF system, PWM wave is now being outputted
 
 ljm.eWriteName(handle, "DIO3_EF_ENABLE", 0)
 ljm.eWriteName(handle, "DIO3_EF_INDEX", 0)
 ljm.eWriteName(handle, "DIO3_EF_OPTIONS", 0)
-ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm_val(motor_neutral))
+ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", uf.pwm_val(motor_neutral))
 ljm.eWriteName(handle, "DIO3_EF_ENABLE", 1)
 
 ljm.eWriteName(handle, "DIO4_EF_ENABLE", 0)
 ljm.eWriteName(handle, "DIO4_EF_INDEX", 0)
 ljm.eWriteName(handle, "DIO4_EF_OPTIONS", 0)
-ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm_val(motor_neutral))
+ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", uf.pwm_val(motor_neutral))
 ljm.eWriteName(handle, "DIO4_EF_ENABLE", 1)
 #################################################
 time.sleep(2)
@@ -189,14 +168,16 @@ group.add_feedback_handler(feedback_handler)
 # Control the robot at 100Hz for 30 seconds
 group.set_feedback_frequency(100)
 
+
+
 pwm = (1400,1400,1500,1500)
-
-
-
-
 print("Servo Values changed")
 
-
+# def update_control_inputs(vector):
+#   ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm_val(vector[0]))
+#   ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm_val(vector[1]))
+#   ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm_val(vector[2]))
+#   ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm_val(vector[3]))
 
 
 i = 0
@@ -219,12 +200,14 @@ while i < loopAmount:
         A[0][5] = results[5]
         AB = A-B40
         R = C40.dot(AB.T)
+
+        uf.update_control_inputs(handle, pwm)
         
 
-        ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm_val(pwm[0]))
-        ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm_val(pwm[1]))
-        ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm_val(pwm[2]))
-        ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm_val(pwm[3]))
+        # ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm_val(pwm[0]))
+        # ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm_val(pwm[1]))
+        # ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm_val(pwm[2]))
+        # ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm_val(pwm[3]))
 
         # actual_position = group_fbk.position
 
@@ -245,10 +228,8 @@ while i < loopAmount:
 
 pwm = (1400,1400,1040,1040)
 
-ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm_val(pwm[0]))
-ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm_val(pwm[1]))
-ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm_val(pwm[2]))
-ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm_val(pwm[3]))
+uf.update_control_inputs(handle, pwm)
+
 
 
 

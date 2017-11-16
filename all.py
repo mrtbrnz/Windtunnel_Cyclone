@@ -19,10 +19,7 @@ import datetime
 servo_neutral = 1500
 motor_neutral = 1040
 
-# Input values to be tested in all combinations
-servo_valsr = [1500, 1700, 1833, 1300, 1100]
-servo_valsl = [1500, 1700, 1900, 1300, 1100]
-motor_vals = [1200, 1300, 1400, 1500, 1600]
+
 
 # Open first found LabJack
 handle = ljm.open(ljm.constants.dtANY, ljm.constants.ctANY, "ANY")
@@ -179,7 +176,7 @@ def go_to_position(desired_position):
     new_position = actual_position + uf.bound(error, 0.05)
     position_rad = uf.bound_arm(new_position)
     print(error, actual_position, new_position)
-    time.sleep(1.0)
+    time.sleep(0.1)
     error = desired_position - actual_position
 
 
@@ -213,16 +210,28 @@ def sequence(handle,position,pwm,loopAmount):
 
 
 # starting Position
-go_to_position(0.75)
+# go_to_position(0.75)
 
+
+# Gravity Polar
 pwm = (1500,1500,1040,1040)
-AoA = np.range(-0.3, +1.3, 0.1)
+AoA_rad = np.arange(-0.3, +1.3, 0.1)
+for i in AoA_rad:
+  sequence(handle,i,pwm,loopAmount)
+
+
 
 # Loop through all combinations of inputs
-for i in range(0, 5):
-    for j in range(0, 5):
-        pwm = (servo_valsr[i], servo_valsl[i], motor_vals[j], motor_vals[j],)
-        sequence(handle,0.70,pwm,loopAmount)
+# Input values to be tested in all combinations
+AoA_rad = np.arange(-0.33, +1.0, 0.1742)
+servo_valsr = [1500, 1700, 1833, 1300, 1100]
+servo_valsl = [1500, 1300, 1100, 1700, 1900]
+motor_vals  = [1200, 1300, 1400, 1500]
+for a in AoA_rad:
+  for i in range(0, len(servo_valsr)):
+      for j in range(0, len(motor_vals)):
+          pwm = (servo_valsr[i], servo_valsl[i], motor_vals[j], motor_vals[j],)
+          sequence(handle,a,pwm,loopAmount)
 
 
 # while i < loopAmount:
@@ -243,8 +252,11 @@ for i in range(0, 5):
 #         print(sys.exc_info()[1])
 #         break
 
-pwm = (1400,1400,1040,1040)
 
+
+
+# Neutral the controls
+pwm = (1500,1500,1040,1040)
 uf.update_control_inputs(handle, pwm)
 
 

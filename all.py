@@ -173,11 +173,10 @@ group.set_feedback_frequency(100)
 pwm = (1400,1400,1500,1500)
 print("Servo Values changed")
 
-# def update_control_inputs(vector):
-#   ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm_val(vector[0]))
-#   ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm_val(vector[1]))
-#   ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm_val(vector[2]))
-#   ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm_val(vector[3]))
+# Start a file
+filename = "log_file.txt"
+
+log_file = open(filename, "w")
 
 
 i = 0
@@ -213,6 +212,7 @@ while i < loopAmount:
 
 
         print("%f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6], pwm[0], pwm[1], pwm[2], pwm[3], actual_position) )
+        log_file.write("%f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f \n" % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6], pwm[0], pwm[1], pwm[2], pwm[3], actual_position))
         # IvySendMsg("LABJACK %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6]) )
         # Raw values
         #IvySendMsg("LABJACK %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), results[0], results[1], results[2], results[3], results[4], results[5], results[6]) )
@@ -233,6 +233,7 @@ uf.update_control_inputs(handle, pwm)
 
 
 
+log_file.close()
 
 # Clear HEBI handler
 group.clear_feedback_handlers()

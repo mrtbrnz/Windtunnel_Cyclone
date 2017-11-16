@@ -1,17 +1,22 @@
 """
-Reading multiple analog inputs (AIN) from a LabJack.
+DAQ code for HEBI and LABJACK
 
 """
+import os
+os.environ['HEBI_C_LIB'] = '/Users/murat/Work/Temporary_Work/DAQ_Py/Hebi_Py/lib/libhebi.dylib'
+
+from hebi import *
+from time import sleep
 
 from labjack import ljm
 import time
 import sys
-import os
-import platform
-from ivy.std_api import *
+# import os
+# import platform
+# from ivy.std_api import *
 import numpy as np
 
-def pwm(value):
+def pwm_val(value):
     return int(value/20000.0*1600000.0)
 
 servo_neutral = 1500
@@ -32,18 +37,21 @@ C40 = np.array([
 		[-0.17046,  -0.00215,   0.08486,  -0.03049,   0.08772,   0.03596 ],
 		[ 0.00226,  -0.08472,  -0.00019,  -0.08519,   0.00105,  -0.08698 ] ])
 
-if os.getenv('IVY_BUS') is not None:
-    IVY_BUS = os.getenv('IVY_BUS')
-elif platform.system() == 'Darwin':
-    IVY_BUS = "127.0.0.1:2010"
-else:
-    IVY_BUS = ""
+# if os.getenv('IVY_BUS') is not None:
+#     IVY_BUS = os.getenv('IVY_BUS')
+# elif platform.system() == 'Darwin':
+#     IVY_BUS = "127.0.0.1:2010"
+# else:
+#     IVY_BUS = ""
 
-IVY_BUS = "127.0.0.1:2010"
+# IVY_BUS = "127.0.0.1:2010"
 
-IvyInit("LABJACK", "LABJACK READY")
-IvyStart(IVY_BUS)
-time.sleep(1)
+# IvyInit("LABJACK", "LABJACK READY")
+# IvyStart(IVY_BUS)
+# time.sleep(1)
+
+
+
 
 # Open first found LabJack
 handle = ljm.open(ljm.constants.dtANY, ljm.constants.ctANY, "ANY")
@@ -54,6 +62,36 @@ print("Opened a LabJack with Device type: %i, Connection type: %i,\n" \
     "Serial number: %i, IP address: %s, Port: %i,\nMax bytes per MB: %i" % \
     (info[0], info[1], info[2], ljm.numberToIP(info[3]), info[4], info[5]))
 
+
+
+# Open the HEBI
+lookup = Lookup()
+group = lookup.get_group_from_names(['X5-1'], ['X-00425'])
+
+if not group:
+  print('Group not found!')
+  exit(1)
+
+
+# Init position
+position_rad = 0.451
+
+# Sets the command lifetime to 100 milliseconds
+group.set_command_lifetime_ms(100)
+
+# Nm/rad
+#spring_constant = -0.5
+group_command = GroupCommand(group.size)
+
+# HEBI feedback Handler
+def feedback_handler(group_fbk):
+  print("Position :", group_fbk.position)
+  group_command.set_position([position_rad])
+  # group_command.set_effort(spring_constant * group_fbk.position)
+  group.send_command(group_command)
+
+
+# Labjack
 # Setup and call eWriteNames to configure AINs on the LabJack.
 settling_us_all = 100 # 10^-6 sec
 numFrames = 27
@@ -108,45 +146,44 @@ ljm.eWriteName(handle, "DIO_EF_CLOCK0_ENABLE", 1)   # Enable the clock source
 ljm.eWriteName(handle, "DIO0_EF_ENABLE", 0)  # Disable the EF system for initial configuration
 ljm.eWriteName(handle, "DIO0_EF_INDEX", 0)   # Configure EF system for PWM
 ljm.eWriteName(handle, "DIO0_EF_OPTIONS", 0) # Configure what clock source to use: Clock0
-ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm(servo_neutral)) # Configure duty cycle to so that PWM is 1500ms
+ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm_val(servo_neutral)) # Configure duty cycle to so that PWM is 1500ms
 ljm.eWriteName(handle, "DIO0_EF_ENABLE", 1) # Enable the EF system, PWM wave is now being outputted
 
 ljm.eWriteName(handle, "DIO2_EF_ENABLE", 0)  # Disable the EF system for initial configuration
 ljm.eWriteName(handle, "DIO2_EF_INDEX", 0)   # Configure EF system for PWM
 ljm.eWriteName(handle, "DIO2_EF_OPTIONS", 0) # Configure what clock source to use: Clock0
-ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm(servo_neutral)) # Configure duty cycle to be: 50%
+ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm_val(servo_neutral)) # Configure duty cycle to be: 50%
 ljm.eWriteName(handle, "DIO2_EF_ENABLE", 1) # Enable the EF system, PWM wave is now being outputted
 
 ljm.eWriteName(handle, "DIO3_EF_ENABLE", 0)
 ljm.eWriteName(handle, "DIO3_EF_INDEX", 0)
 ljm.eWriteName(handle, "DIO3_EF_OPTIONS", 0)
-ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm(motor_neutral))
+ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm_val(motor_neutral))
 ljm.eWriteName(handle, "DIO3_EF_ENABLE", 1)
 
 ljm.eWriteName(handle, "DIO4_EF_ENABLE", 0)
 ljm.eWriteName(handle, "DIO4_EF_INDEX", 0)
 ljm.eWriteName(handle, "DIO4_EF_OPTIONS", 0)
-ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm(motor_neutral))
+ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm_val(motor_neutral))
 ljm.eWriteName(handle, "DIO4_EF_ENABLE", 1)
 #################################################
-
+time.sleep(2)
 print("\nStarting %s read loops.%s" % (str(loopAmount), s))
 delay = 0.1 #delay between readings (in sec)
 duration = 5.0 # Seconds
 
 
-pwm = (1400,1400,1200,1200)
-val1 = pwm[0]
-val2 = pwm[1]
-val3 = pwm[2]
-val4 = pwm[3]
-print(pwm(val1))
+group.add_feedback_handler(feedback_handler)
+# Control the robot at 100Hz for 30 seconds
+group.set_feedback_frequency(100)
 
-ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm(val1)) 
-ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm(val2))
-ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm(val3))
-ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm(val4))
+pwm = (1400,1400,1200,1200)
+
+
+
+
 print("Servo Values changed")
+
 
 
 
@@ -171,6 +208,13 @@ while i < loopAmount:
         AB = A-B40
         R = C40.dot(AB.T)
         
+
+        ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm_val(pwm[0]))
+        ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm_val(pwm[1]))
+        ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm_val(pwm[2]))
+        ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm_val(pwm[3]))
+
+
         print("%f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f" % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6], pwm[0], pwm[1], pwm[2], pwm[3]) )
         # IvySendMsg("LABJACK %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6]) )
         # Raw values
@@ -185,15 +229,19 @@ while i < loopAmount:
         print(sys.exc_info()[1])
         break
 
+pwm = (1400,1400,1040,1040)
+
+ljm.eWriteName(handle, "DIO0_EF_CONFIG_A", pwm_val(pwm[0]))
+ljm.eWriteName(handle, "DIO2_EF_CONFIG_A", pwm_val(pwm[1]))
+ljm.eWriteName(handle, "DIO3_EF_CONFIG_A", pwm_val(pwm[2]))
+ljm.eWriteName(handle, "DIO4_EF_CONFIG_A", pwm_val(pwm[3]))
 
 
 
 
-
-
-
-
+# Clear HEBI handler
+group.clear_feedback_handlers()
 
 # Close handle
 ljm.close(handle)
-IvyStop()
+# IvyStop()

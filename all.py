@@ -151,6 +151,7 @@ duration = 5.0 # Seconds
 
 
 group.add_feedback_handler(feedback_handler)
+position_rad = actual_position
 # Control the robot at 100Hz for 30 seconds
 group.set_feedback_frequency(100)
 
@@ -167,16 +168,16 @@ log_file = open(filename, "w")
 
 
 def go_to_position(desired_position):
+  global position_rad
+  global actual_position
   error = desired_position - actual_position
   while abs(error) > 0.05:
     new_position = actual_position + uf.bound(error, 0.05)
     position_rad = uf.bound_arm(new_position)
+    print(error, actual_position, new_position)
+    time.sleep(1.0)
     error = desired_position - actual_position
 
-go_to_position(0.6)
-
-
-uf.update_control_inputs(handle, pwm)
 
 loopAmount = int(duration/delay)
 
@@ -200,8 +201,29 @@ def do_measurement(number):
         print(sys.exc_info()[1])
         break
 
+def sequence(handle,position,pwm,loopAmount):
+  uf.update_control_inputs(handle, pwm)
+  go_to_position(position)
+  time.sleep(2)
+  do_measurement(loopAmount)
 
-do_measurement(loopAmount)
+
+# starting Position
+go_to_position(0.75)
+
+pwm = (1500,1500,1040,1040)
+AoA = np.range(-0.3, +1.3, 0.1)
+
+
+sequence(handle,0.70,pwm,loopAmount)
+
+
+
+
+
+
+
+
 
 # while i < loopAmount:
 #     try:

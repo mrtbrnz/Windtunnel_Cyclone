@@ -19,6 +19,10 @@ import datetime
 servo_neutral = 1500
 motor_neutral = 1040
 
+# Input values to be tested in all combinations
+servo_valsr = [1500, 1700, 1833, 1300, 1100]
+servo_valsl = [1500, 1700, 1900, 1300, 1100]
+motor_vals = [1200, 1300, 1400, 1500, 1600]
 
 # Open first found LabJack
 handle = ljm.open(ljm.constants.dtANY, ljm.constants.ctANY, "ANY")
@@ -214,15 +218,11 @@ go_to_position(0.75)
 pwm = (1500,1500,1040,1040)
 AoA = np.range(-0.3, +1.3, 0.1)
 
-
-sequence(handle,0.70,pwm,loopAmount)
-
-
-
-
-
-
-
+# Loop through all combinations of inputs
+for i in range(0, 5):
+    for j in range(0, 5):
+        pwm = (servo_valsr[i], servo_valsl[i], motor_vals[j], motor_vals[j],)
+        sequence(handle,0.70,pwm,loopAmount)
 
 
 # while i < loopAmount:

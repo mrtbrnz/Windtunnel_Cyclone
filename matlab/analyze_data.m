@@ -33,10 +33,11 @@ C40 =  [ 0.10573,  -0.04946,  -0.03339,   6.31374,  -0.04072,  -6.35659 ;
 		-0.17046,  -0.00215,   0.08486,  -0.03049,   0.08772,   0.03596 ;
 		 0.00226,  -0.08472,  -0.00019,  -0.08519,   0.00105,  -0.08698 ];
 
-R_cal = bsxfun(@plus,R(:,1:6),B40);
+R_cal = bsxfun(@minus,R(:,1:6),B40);
 R_cal = C40*R_cal.';
 R_cal = R_cal.';
 
+% Subtract gravity polar if it is not that measurement
 if(~strcmp(filename, '../gravity_polar.txt'))
     load('grav_calibration.mat')
 end

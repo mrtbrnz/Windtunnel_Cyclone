@@ -175,6 +175,7 @@ pwm = (1400,1400,1500,1500)
 print("Servo Values changed")
 
 # Start a file
+datenow = datetime.datetime.now()
 filename = datenow.strftime("%d_%m_%y__%H_%M")
 
 log_file = open(filename, "w")

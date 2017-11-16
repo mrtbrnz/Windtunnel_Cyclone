@@ -15,6 +15,12 @@ def bound_arm(value):
         value = minvalue
     return value
 
+def bound(value, maxv):
+	if(value>maxv):
+        value = maxv
+    elif(value< -maxv):
+        value = -maxv
+    return value
 
 
 def update_control_inputs(handle, vector):

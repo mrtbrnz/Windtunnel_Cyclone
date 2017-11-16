@@ -19,21 +19,6 @@ import datetime
 servo_neutral = 1500
 motor_neutral = 1040
 
-# C17 = np.array([
-# 		[-0.00913,  -0.08197,   0.00814,  -3.33902,  -0.06631,   3.24349 ],
-# 		[ 0.15977,   4.06983,  -0.04982,  -1.98943,   0.02155,  -1.81224 ],
-# 		[ 3.75783,   0.01159,   3.81047,  -0.05917,   3.73985,   0.01544 ],
-# 		[ 0.59718,  24.80018,  20.62192, -12.26305, -21.14349, -11.18867 ],
-# 		[-23.74593, 0.36636,   12.62541,  20.26775,  12.67510, -19.73277 ],
-# 		[ 0.31759,  15.10976,   0.20531,  14.88887,   0.04100,  14.32650 ] ])
-# C40 = np.array([
-# 		[ 0.10573,  -0.04946,  -0.03339,   6.31374,  -0.04072,  -6.35659 ],
-# 		[ 0.24983,  -7.21789,   0.12016,   3.62807,  -0.08762,   3.70953 ],
-# 		[10.12504,   0.21548,  10.10169,   0.36926,  10.57529,   0.28278 ],
-# 		[-0.00249,  -0.03763,   0.14501,   0.02394,  -0.15264,   0.01486 ],
-# 		[-0.17046,  -0.00215,   0.08486,  -0.03049,   0.08772,   0.03596 ],
-# 		[ 0.00226,  -0.08472,  -0.00019,  -0.08519,   0.00105,  -0.08698 ] ])
-
 
 # Open first found LabJack
 handle = ljm.open(ljm.constants.dtANY, ljm.constants.ctANY, "ANY")
@@ -59,7 +44,7 @@ if not group:
 position_rad = 0.451
 # global actual_position
 
-actual_position = 5.0
+actual_position = 0.5
 
 def update_position(value):
   global actual_position
@@ -161,7 +146,7 @@ ljm.eWriteName(handle, "DIO4_EF_ENABLE", 1)
 #################################################
 time.sleep(2)
 print("\nStarting %s read loops.%s" % (str(loopAmount), s))
-delay = 0.1 #delay between readings (in sec)
+delay = 0.007 #delay between readings (in sec)
 duration = 5.0 # Seconds
 
 
@@ -181,37 +166,31 @@ filename = datenow.strftime("%d_%m_%y__%H_%M")
 log_file = open(filename, "w")
 
 
-i = 0
-# A = np.array([[0.0,0.0,0.0,0.0,0.0,0.0]])
-# B40 = np.array([[0.1476432979106903, 0.14606346189975739, -0.11490651965141296, 0.1375323235988617, 0.09234895557165146, -0.29624149203300476]])
-# B17 = np.array([[-0.08521055430173874, 0.22347553074359894, -0.10100627690553665, 0.45128822326660156, 0.1454315185546875, 0.5179573893547058]])
+def go_to_position(desired_position):
+  error = desired_position - actual_position
+  while abs(error) > 0.05:
+    new_position = actual_position + uf.bound(error, 0.05)
+    position_rad = uf.bound_arm(new_position)
+    error = desired_position - actual_position
+
+go_to_position(0.6)
+
+
+uf.update_control_inputs(handle, pwm)
 
 loopAmount = int(duration/delay)
 
-while i < loopAmount:
+def do_measurement(number):
+  i = 0
+  while i < number:
     try:
         results = ljm.eReadNames(handle, numFrames, names)
-        #print("\n %i, Time:%f, AIN0 : %f V, AIN1 : %f V" % (i, time.time(), results[0], results[1]))
-        # Function for this
-        # A[0][0] = results[0]
-        # A[0][1] = results[1]
-        # A[0][2] = results[2]
-        # A[0][3] = results[3]
-        # A[0][4] = results[4]
-        # A[0][5] = results[5]
-        # AB = A-B40
-        # R = C40.dot(AB.T)
-        R = uf.signal_to_force(results)
-
-        uf.update_control_inputs(handle, pwm)
-        
-
-        print("%f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6], pwm[0], pwm[1], pwm[2], pwm[3], actual_position) )
+        #R = uf.signal_to_force(results)
+        R = results
+        # uf.update_control_inputs(handle, pwm)
+        #print("%f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6], pwm[0], pwm[1], pwm[2], pwm[3], actual_position) )
         log_file.write("%f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f \n" % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6], pwm[0], pwm[1], pwm[2], pwm[3], actual_position))
-        # IvySendMsg("LABJACK %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6]) )
-        # Raw values
-        #IvySendMsg("LABJACK %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), results[0], results[1], results[2], results[3], results[4], results[5], results[6]) )
-        #print(i, time.time(), results[0], results[1],  results[2], results[3], results[4], results[5])
+
         time.sleep(delay)
         i = i + 1
     except KeyboardInterrupt:
@@ -220,6 +199,27 @@ while i < loopAmount:
         import sys
         print(sys.exc_info()[1])
         break
+
+
+do_measurement(loopAmount)
+
+# while i < loopAmount:
+#     try:
+#         results = ljm.eReadNames(handle, numFrames, names)
+#         #R = uf.signal_to_force(results)
+#         R = results
+#         # uf.update_control_inputs(handle, pwm)
+#         #print("%f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f " % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6], pwm[0], pwm[1], pwm[2], pwm[3], actual_position) )
+#         log_file.write("%f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f  %f \n" % (time.time(), R[0], R[1], R[2], R[3], R[4], R[5], results[6], pwm[0], pwm[1], pwm[2], pwm[3], actual_position))
+
+#         time.sleep(delay)
+#         i = i + 1
+#     except KeyboardInterrupt:
+#         break
+#     except Exception:
+#         import sys
+#         print(sys.exc_info()[1])
+#         break
 
 pwm = (1400,1400,1040,1040)
 

@@ -68,7 +68,19 @@ Propellers on again for higher speeds !
 
 27- 13m/s : servos were not plugged (15_55)
 28- 13m/s with motors on  (17_11_17__15_56)
-AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+35), 0.17453)
+	AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+35), 0.17453)
+	servo_valsr = [1500, 1700, 1833, 1300]
+	servo_valsl = [1500, 1300, 1100, 1700]
+	motor_vals  = [1400, 1500, 1600, 1700]
+
+Back from cofee break
+29- 16m/s : (17_11_17__16_59)
+AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+15), 0.0853)
 servo_valsr = [1500, 1700, 1833, 1300]
 servo_valsl = [1500, 1300, 1100, 1700]
 motor_vals  = [1400, 1500, 1600, 1700]
+
+
+
+
+

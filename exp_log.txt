@@ -50,7 +50,25 @@ Took the propellers off !
 17 - New gravity polar without the propellers. (17_11_17__14_21)
 
 Starting the clean aircraft configuration tests
+2 wrong starts...
+18- 4m/s (17_11_17__14_29)
+19- 6m/s (17_11_17__14_41)
+20- 8m/s (14_51) Servo stopped working !!! we will repeating again.
+21- 8m/s again, restarted. (14_57) The servo stopped again at around 62 degrees of AoA. The windtunnel is generating too much pressure on the control surface.
+So much that it shuts-off.
 
-18- 4m/s
+22- 10m/s with less AoA forgot to plug the servos
+23- 10m/s up to +35deg AoA (17_11_17__15_10)
+24- 13m/s upto +35deg AoA (17_11_17__15_15)
+25- 16m/s (17_11_17__15_22)
+26- 20m/s trial DAMN! FAST! :) (17_11_17__15_31)
 
+#########################
+Propellers on again for higher speeds !
 
+27- 13m/s : servos were not plugged (15_55)
+28- 13m/s with motors on  (17_11_17__15_56)
+AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+35), 0.17453)
+servo_valsr = [1500, 1700, 1833, 1300]
+servo_valsl = [1500, 1300, 1100, 1700]
+motor_vals  = [1400, 1500, 1600, 1700]

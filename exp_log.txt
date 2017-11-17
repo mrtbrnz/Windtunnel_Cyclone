@@ -1,0 +1,12 @@
+17th of November - 2nd day of TU-Delft WindTunnel Campaign
+==========================================================
+Corrected the airspeed sensor, and orientation of the vehicle
+1- Gravity Polar (17_11_17__09_09)
+2- Half- 4m/s stopped it at the middle (no log)
+Calibrated the control surface deflections
+3- 4m/s full polar -5 to +75deg. (17_11_17__09_35)
+4- 6m/s full polar -5 to +75deg. (17_11_17__10_01)
+5- 8m/s full polar -5 to +75deg. (17_11_17__10_40)
+6- Another gravity polar with 104g of weight attached to the top of the front connection line of the nose. (17_11_17__11_24)
+7- 10m/s first trail, actuator is not strong enough to hold it... (17_11_17__11_46)
+8- 10m/s 2nd trail, not successful (17_11_17__11_51)

@@ -7,8 +7,8 @@ def pwm_val(value):
     
 
 def bound_arm(value):
-    maxvalue = 1.34
-    minvalue = -0.33
+    maxvalue = 1.45
+    minvalue = -0.35
     if(value>maxvalue):
         value = maxvalue
     elif(value<minvalue):
@@ -61,6 +61,7 @@ def signal_to_force(signal):
 	return force
 
 def get_hebi_from_aircraft_angle(angle):
-    return ((angle - 30)*0.0186+0.503)
+    # return ((angle - 30)*0.0186+0.503)
+    return ((angle - 30)*0.01745329+0.4715)
 
 

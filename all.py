@@ -42,7 +42,7 @@ if not group:
 
 
 # Init position
-position_rad = 0.451
+position_rad = 0.5
 # global actual_position
 
 actual_position = 0.5
@@ -196,10 +196,12 @@ def do_measurement(number):
         time.sleep(delay)
         i = i + 1
     except KeyboardInterrupt:
+        log_file.close()
         break
     except Exception:
         import sys
         print(sys.exc_info()[1])
+        log_file.close()
         break
 
 def sequence(handle,position,pwm,loopAmount):
@@ -217,22 +219,70 @@ def sequence(handle,position,pwm,loopAmount):
 # pwm = (1500,1500,1040,1040)
 # AoA_rad = np.arange(-0.3, +1.3, 0.1)
 # for i in AoA_rad:
+#   print ("Measuring the %f AoA..." % i)
 #   sequence(handle,i,pwm,loopAmount)
 
 
+# ######## LOW SPEED NO MOTOR CASES ########
+# # Loop through all combinations of inputs
+# # Input values to be tested in all combinations
+# # AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+20), 0.0853)
+# AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+35), 0.174553)
+# #AoA_rad = np.arange(-0.33, +1.0, 0.1742)
+# servo_valsr = [1500, 1700, 1833, 1300, 1170]
+# servo_valsl = [1500, 1300, 1100, 1700, 1900]
+# motor_vals  = [1040]
+# for a in AoA_deg:
+#   for i in range(0, len(servo_valsr)):
+#       for j in range(0, len(motor_vals)):
+#           pwm = (servo_valsr[i], servo_valsl[i], motor_vals[j], motor_vals[j],)
+#           print ("Measuring the %f AoA with %f of motor and %f of deflection..." % ((a*180.0/np.pi), motor_vals[j], servo_valsr[i]))
+#           sequence(handle,a,pwm,loopAmount)
 
-# Loop through all combinations of inputs
-# Input values to be tested in all combinations
-AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+65), 0.1742)
+
+# ######## LOW SPEED CASES ########
+# # Loop through all combinations of inputs
+# # Input values to be tested in all combinations
+# AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+75), 0.17453)
+# #AoA_rad = np.arange(-0.33, +1.0, 0.1742)
+# servo_valsr = [1500, 1700, 1833, 1300, 1170]
+# servo_valsl = [1500, 1300, 1100, 1700, 1900]
+# motor_vals  = [1200, 1300, 1400, 1500, 1600]
+# for a in AoA_deg:
+#   for i in range(0, len(servo_valsr)):
+#       for j in range(0, len(motor_vals)):
+#           pwm = (servo_valsr[i], servo_valsl[i], motor_vals[j], motor_vals[j],)
+#           print ("Measuring the %f AoA with %f of motor and %f of deflection..." % ((a*180.0/np.pi), motor_vals[j], servo_valsr[i]))
+#           sequence(handle,a,pwm,loopAmount)
+
+
+# # ######## STATIC CASE ########
+# a = 0.5
+# servo_valsr = [1500, 1700, 1833, 1300, 1170]
+# servo_valsl = [1500, 1300, 1100, 1700, 1900]
+# motor_vals  = [1200, 1300, 1600, 1500, 1400]
+# for i in range(0, len(servo_valsr)):
+#     for j in range(0, len(motor_vals)):
+#         pwm = (servo_valsr[i], servo_valsl[i], motor_vals[j], motor_vals[j],)
+#         print ("Measuring the %f AoA with %f of motor and %f of deflection..." % ((a*180.0/np.pi), motor_vals[j], servo_valsr[i]))
+#         sequence(handle,a,pwm,loopAmount)
+
+
+####### HIGH SPEED CASES ########
+#Loop through all combinations of inputs
+#Input values to be tested in all combinations
+AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+15), 0.0853)
 #AoA_rad = np.arange(-0.33, +1.0, 0.1742)
-servo_valsr = [1500, 1700, 1833, 1300, 1100]
-servo_valsl = [1500, 1300, 1100, 1700, 1900]
-motor_vals  = [1200, 1300, 1400, 1500]
+servo_valsr = [1500, 1700, 1833, 1300]
+servo_valsl = [1500, 1300, 1100, 1700]
+motor_vals  = [1400, 1500, 1600, 1700]
 for a in AoA_deg:
   for i in range(0, len(servo_valsr)):
       for j in range(0, len(motor_vals)):
           pwm = (servo_valsr[i], servo_valsl[i], motor_vals[j], motor_vals[j],)
+          print ("Measuring the %f AoA with %f of motor and %f of deflection..." % ((a*180.0/np.pi), motor_vals[j], servo_valsr[i]))
           sequence(handle,a,pwm,loopAmount)
+
 
 
 # while i < loopAmount:

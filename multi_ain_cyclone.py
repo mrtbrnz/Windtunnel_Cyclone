@@ -98,7 +98,7 @@ else:
 
 print("\nStarting %s read loops.%s" % (str(loopAmount), s))
 delay = 0.1 #delay between readings (in sec)
-duration = 5.0 # Seconds
+duration = 15.0 # Seconds
 i = 0
 A = np.array([[0.0,0.0,0.0,0.0,0.0,0.0]])
 B40 = np.array([[0.1476432979106903, 0.14606346189975739, -0.11490651965141296, 0.1375323235988617, 0.09234895557165146, -0.29624149203300476]])

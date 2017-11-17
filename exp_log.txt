@@ -1,5 +1,24 @@
-17th of November - 2nd day of TU-Delft WindTunnel Campaign
-==========================================================
+15th Preparation day
+====================
+Get the setup completed at the end of the day, and Ewoud blew the ESCs away !!! :)
+
+
+16th of November - 1st day of the TU-Delft WindTunnel Campaign
+==============================================================
+Repaired the ESCs and get the system working again in the morning
+Worked on the code in the begining of the afternoon
+
+Around 4 o'clock we started the first full trials...
+
+
+Missing things:
+-Pressure sensor was not correctly tubed, reverse total and static pressure.
+-Forgot to do no propeller tests
+-
+
+
+17th of November - 2nd day
+==============================================================
 Corrected the airspeed sensor, and orientation of the vehicle
 1- Gravity Polar (17_11_17__09_09)
 2- Half- 4m/s stopped it at the middle (no log)
@@ -7,6 +26,31 @@ Calibrated the control surface deflections
 3- 4m/s full polar -5 to +75deg. (17_11_17__09_35)
 4- 6m/s full polar -5 to +75deg. (17_11_17__10_01)
 5- 8m/s full polar -5 to +75deg. (17_11_17__10_40)
-6- Another gravity polar with 104g of weight attached to the top of the front connection line of the nose. (17_11_17__11_24)
+6- Another gravity polar with 105.3g of weight attached to the top of the front connection line of the nose. (17_11_17__11_24)
 7- 10m/s first trail, actuator is not strong enough to hold it... (17_11_17__11_46)
-8- 10m/s 2nd trail, not successful (17_11_17__11_51)
+8- 10m/s 2nd trail of (-5 to +65deg), not successful (17_11_17__11_51)
+--- Lunch Break ----
+9- 10m/s with higher throttle values...
+10- Trying again the below combination for 10m/s ... (13_17)
+    Removed the +flap deflections and increased the throttle
+    AoA_deg = np.arange(uf.get_hebi_from_aircraft_angle(-5), uf.get_hebi_from_aircraft_angle(+65), 0.17453)
+    servo_valsr = [1500, 1700, 1833]
+    servo_valsl = [1500, 1300, 1100]
+    motor_vals  = [1500, 1600, 1700, 1800]
+WORKED!
+11- Static condition now with more throttle value... nope
+12- Again static... nope!
+13- One more static , damn forgot to change the throttle....
+14- taped and changed the throttle so trhat it is not limitted 14_03
+15... Several trials with static condition...
+16 - Finally one static test : (17_11_17__14_11)
+
+#########################
+Took the propellers off !
+17 - New gravity polar without the propellers. (17_11_17__14_21)
+
+Starting the clean aircraft configuration tests
+
+18- 4m/s
+
+

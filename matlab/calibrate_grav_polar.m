@@ -10,9 +10,14 @@ for i=1:length(index)-1
     time_mean(i) = time(round(index_mean(i)));
     arm_mean(i) = mean(arm_pos(index(i)+1:index(i+1)));
     
-    R_mean(i,:) = mean(R_cal(index(i)+1:index(i+1),:),1);
+    R_mean(i,:) = mean(R(index(i)+1:index(i+1),1:6),1);
 end
 
-R_grav = R_mean; arm_grav = arm_mean;
+R_grav = R_mean; arm_grav = arm_mean.';
 
-save('grav_calibration', 'R_grav', 'arm_grav')
+offset = ones(length(arm_grav),1);
+inputs = [offset sin(arm_grav) cos(arm_grav)];
+model_fit = inputs\R_grav;
+
+
+save('grav_calibration', 'model_fit')
